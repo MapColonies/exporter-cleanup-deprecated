@@ -1,0 +1,10 @@
+[template]
+src = "production.tmpl"
+dest = "/config/production.json"
+keys = [
+    "/configuration/logger/level",
+    "/configuration/db/service/url",
+    "/configuration/max/retries",
+    "/configuration/export/directory",
+    "/configuration/batch/size"
+]

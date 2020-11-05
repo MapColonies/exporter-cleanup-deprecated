@@ -1,0 +1,15 @@
+.git
+.vscode
+.idea
+
+*Dockerfile*
+*docker-compose*
+
+dist
+coverage
+node_modules
+config
+jest_html_reporters.html
+
+*.md
+*.log
