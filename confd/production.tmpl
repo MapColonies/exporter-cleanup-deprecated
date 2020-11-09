@@ -1,0 +1,9 @@
+{
+  "logger": {
+    "level": "{{ getv "/configuration/logger/level" "warn" }}"
+  },
+  "dbServiceUrl": "{{ getv "/configuration/db/service/url" "http://localhost:8081" }}",
+  "maxRetries": {{ getv "/configuration/max/retries" "3" }},
+  "exportDirectory": "{{ getv "/configuration/export/directory" "/exporterOutput" }}",
+  "batchSize": {{ getv "/configuration/batch/size" "100" }}
+}

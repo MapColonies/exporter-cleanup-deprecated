@@ -1,0 +1,64 @@
+{
+  "name": "exporter-cleanup",
+  "version": "1.0.0",
+  "description": "map exporter cleanup task worker",
+  "main": "src/cleanup-task.js",
+  "scripts": {
+    "test:unit": "jest --coverage --testPathPattern=\"./src/tests/unit/.*.spec.ts\" --reporters='default' --reporters='jest-html-reporters' --watchAll=false",
+    "test:integration": "jest --testPathPattern=\"./src/tests/integration/.*.spec.ts\"",
+    "lint": "eslint src/**",
+    "lint:fix": "eslint --fix src/**",
+    "release": "standard-version",
+    "test": "npm run lint && npm run test:unit && npm run test:integration",
+    "start": "node ./src/cleanup-task.js",
+    "confd": "node ./confd/generate-config.js",
+    "confd:prod": "node ./confd/generate-config.js --environment production"
+  },
+  "directories": {
+    "test": "tests"
+  },
+  "author": "",
+  "license": "ISC",
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^9.1.1",
+    "@commitlint/config-conventional": "^10.0.0",
+    "@types/config": "0.0.36",
+    "@types/jest": "^26.0.12",
+    "commitlint": "^9.1.2",
+    "cz-conventional-changelog": "^3.3.0",
+    "eslint": "^7.8.1",
+    "eslint-config-standard": "^16.0.1",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-jest": "^24.1.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "husky": "^4.2.5",
+    "jest": "^26.4.2",
+    "jest-create-mock-instance": "^1.1.0",
+    "jest-html-reporters": "^2.0.3",
+    "standard-version": "^9.0.0"
+  },
+  "dependencies": {
+    "@map-colonies/mc-logger": "^1.2.1",
+    "axios": "^0.21.0",
+    "config": "^3.3.1",
+    "dotenv": "^8.2.0",
+    "lodash": "^4.17.20"
+  },
+  "jest": {
+    "coverageReporters": [
+      "text",
+      "html"
+    ]
+  }
+}
