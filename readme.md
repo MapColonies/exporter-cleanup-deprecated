@@ -4,8 +4,7 @@ when run it will removed all expired files from fs and all expired records from 
 
 ### configurations:
 The service configuration file can be created by running ```npm run confd``` or ```npm run confd:prod``. 
-The generated values are taken from env if existent,
-
+The generated values are taken from env if exists,
 for dev deployments the configuration file can then be modified manually.
 
 The configuration contains the following values:
