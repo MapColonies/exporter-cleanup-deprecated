@@ -49,7 +49,7 @@ async function deleteFromDb(deletedIds) {
       let body = _.get(error, 'response.data', '');
       body = JSON.stringify(body);
       logger.error(
-        `filed to delete files from db. attempt ${i} of ${maxRetries}. filed ids: ${deletedIds.toString()}. body: ${body}`
+        `failed to delete files from db. attempt ${i} of ${maxRetries}. failed ids: ${deletedIds.toString()}. body: ${body}`
       );
     }
   }
@@ -71,11 +71,14 @@ function deleteFiles(files) {
         deleted.push(file.taskId);
       } catch (err) {
         logger.error(
-          `filed to delete file: ${path} task id: ${file.taskId}, ${err.message}`
+          `failed to delete file: ${path} task id: ${file.taskId}, ${err.message}`
         );
         logger.error(`err: ${JSON.stringify(err)}`);
       }
     } else {
+      logger.warn(
+        `deleting record ${file.taskId} with missing file: ${path} . file full path: ${file.fileURI} .`
+      );
       deleted.push(file.taskId);
     }
   });
@@ -102,4 +105,9 @@ async function main() {
   } while (!done);
 }
 
-main();
+try {
+  main();
+} catch (err) {
+  logger.error(err.message);
+  process.exit(1);
+}

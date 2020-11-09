@@ -1,6 +1,6 @@
 {
   "logger": {
-    "level": "{{ getv "/configuration/logger/level" "error" }}"
+    "level": "{{ getv "/configuration/logger/level" "warn" }}"
   },
   "dbServiceUrl": "{{ getv "/configuration/db/service/url" "http://localhost:8081" }}",
   "maxRetries": {{ getv "/configuration/max/retries" "3" }},

@@ -12,10 +12,7 @@
   "rules": {
     "eol-last": "off",
     "space-before-function-paren": "off",
-    "indent": [
-      "error",
-      2
-    ],
+    "indent": ["error", 2],
     "quotes": [
       "error",
       "single",
@@ -30,14 +27,8 @@
         "omitLastInOneLineBlock": true
       }
     ],
-    "one-var": [
-      "off"
-    ],
-    "space-before-blocks": [
-      "off"
-    ],
-    "camelcase": [
-      "warn"
-    ]
+    "one-var": ["off"],
+    "space-before-blocks": ["off"],
+    "camelcase": ["warn"]
   }
 }

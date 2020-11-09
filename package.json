@@ -2,7 +2,7 @@
   "name": "exporter-cleanup",
   "version": "1.0.0",
   "description": "map exporter cleanup task worker",
-  "main": "index.ts",
+  "main": "src/cleanup-task.js",
   "scripts": {
     "test:unit": "jest --coverage --testPathPattern=\"./src/tests/unit/.*.spec.ts\" --reporters='default' --reporters='jest-html-reporters' --watchAll=false",
     "test:integration": "jest --testPathPattern=\"./src/tests/integration/.*.spec.ts\"",

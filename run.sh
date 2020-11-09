@@ -1,1 +1,1 @@
-npm run confd:prod && echo "hi" && node ./src/cleanup-task.js
+npm run confd:prod && node ./src/cleanup-task.js
