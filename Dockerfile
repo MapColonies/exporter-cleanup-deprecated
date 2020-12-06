@@ -5,6 +5,7 @@ RUN wget -O '/confd/confd' 'https://github.com/kelseyhightower/confd/releases/do
 RUN chmod +x /confd/confd
 
 FROM node-base as production
+RUN groupadd -r app && useradd -r -g app app
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 WORKDIR /usr/app
@@ -14,5 +15,8 @@ RUN chmod +x run.sh
 COPY ./package*.json ./
 RUN npm install --only=production
 COPY . .
+
+RUN chown -R app . && mkdir -p /home/app/.config && chown -R app:app /home/app/.config
+USER app:app
 
 CMD ["./run.sh"]
