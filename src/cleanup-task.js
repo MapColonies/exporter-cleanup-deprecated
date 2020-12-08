@@ -1,8 +1,10 @@
 const config = require('config');
+const { exception } = require('console');
 const axios = require('axios').default;
 const fs = require('fs');
 const _ = require('lodash');
 const logger = CreateLogger();
+let s3Client;
 
 function CreateLogger() {
   const MCLogger = require('@map-colonies/mc-logger').MCLogger;
@@ -13,7 +15,7 @@ function CreateLogger() {
 }
 
 async function getExpiredBatch(batchSize, offset) {
-  let dbServiceUrl = config.get('dbServiceUrl');
+  let dbServiceUrl = config.get('db.ServiceUrl');
   if (!dbServiceUrl.endsWith('/')) {
     dbServiceUrl += '/';
   }
@@ -35,8 +37,8 @@ async function getExpiredBatch(batchSize, offset) {
 }
 
 async function deleteFromDb(deletedIds) {
-  const maxRetries = config.get('maxRetries');
-  let dbServiceUrl = config.get('dbServiceUrl');
+  const maxRetries = config.get('db.MaxRetries');
+  let dbServiceUrl = config.get('db.ServiceUrl');
   if (!dbServiceUrl.endsWith('/')) {
     dbServiceUrl += '/';
   }
@@ -55,34 +57,108 @@ async function deleteFromDb(deletedIds) {
   }
 }
 
-function deleteFiles(files) {
-  const deleted = [];
+async function deleteFilesFS(files) {
+  const deleted = new Set();
   const exportDirectory = config.get('exportDirectory');
+  const formats = config.get('fileFormats');
   files.forEach((file) => {
     let path = `${exportDirectory}/`;
     if (file.directoryName) {
       path += `${file.directoryName}/`;
     }
     path += file.fileName;
-    if (fs.existsSync(path)) {
-      try {
-        logger.info(`deleting file: ${path} task id: ${file.taskId}.`);
-        fs.unlinkSync(path);
-        deleted.push(file.taskId);
-      } catch (err) {
-        logger.error(
-          `failed to delete file: ${path} task id: ${file.taskId}, ${err.message}`
-        );
-        logger.error(`err: ${JSON.stringify(err)}`);
+    formats.forEach((format) => {
+      const fullPath = `${path}.${format}`;
+      if (fs.existsSync(fullPath)) {
+        try {
+          logger.info(`deleting file: ${fullPath} task id: ${file.taskId}.`);
+          fs.unlinkSync(fullPath);
+          deleted.add(file.taskId);
+        } catch (err) {
+          logger.error(
+            `failed to delete file: ${fullPath} task id: ${file.taskId}, ${err.message}`
+          );
+          logger.error(`err: ${JSON.stringify(err)}`);
+        }
       }
-    } else {
+    });
+    if (!deleted.has(file.taskId)) {
       logger.warn(
         `deleting record ${file.taskId} with missing file: ${path} . file full path: ${file.fileURI} .`
       );
-      deleted.push(file.taskId);
+      deleted.add(file.taskId);
     }
   });
-  return deleted;
+  return Promise.resolve(Array.from(deleted));
+}
+
+function getS3Client() {
+  if (s3Client === undefined) {
+    const S3 = require('aws-sdk/clients/s3');
+    const s3Config = config.get('s3');
+    const clientConfig = {
+      apiVersion: s3Config.apiVersion,
+      endpoint: s3Config.endpoint,
+      accessKeyId: s3Config.accessKeyId,
+      secretAccessKey: s3Config.secretAccessKey,
+      maxRetries: s3Config.maxRetries,
+      sslEnabled: s3Config.sslEnabled,
+      s3ForcePathStyle: true
+    };
+    s3Client = new S3(clientConfig);
+  }
+  return s3Client;
+}
+
+async function deleteFilesS3(files) {
+  const s3Client = getS3Client();
+  const formats = config.get('fileFormats');
+  const parms = {
+    Bucket: config.get('s3.bucket'),
+    Delete: {
+      Objects: []
+    }
+  };
+  const taskDic = {};
+  files.forEach((file) => {
+    let path = '';
+    if (file.directoryName) {
+      path += `${file.directoryName}/`;
+    }
+    path += file.fileName;
+    formats.forEach((format) => {
+      const fullPath = `${path}.${format}`;
+      taskDic[fullPath] = file.taskId;
+      parms.Delete.Objects.push({ Key: fullPath });
+      logger.info(`deleting file: ${fullPath} task id: ${file.taskId}.`);
+    });
+  });
+  return new Promise((resolve, reject) => {
+    s3Client.deleteObjects(parms, (err, data) => {
+      const deleted = new Set();
+      if (err) {
+        logger.error(`failed to delete from s3: ${JSON.stringify(err)}`);
+      } else {
+        // get deleted from data
+        data.Deleted.forEach((file) => {
+          deleted.add(taskDic[file.Key]);
+          logger.info(
+            `file deleted: ${file.Key} task id: ${taskDic[file.Key]}.`
+          );
+        });
+        if (data.Errors) {
+          data.Errors.forEach((file) => {
+            logger.error(
+              `failed to delete file: ${file.Key} task id: ${
+                taskDic[file.Key]
+              }, ${file.Code}`
+            );
+          });
+        }
+      }
+      resolve(Array.from(deleted));
+    });
+  });
 }
 
 async function deleteBatch(batchSize, offset) {
@@ -90,7 +166,23 @@ async function deleteBatch(batchSize, offset) {
   if (files.length === 0) {
     return true;
   }
-  const deleted = deleteFiles(files);
+  let deleted = [];
+  const invalidEngineMessage =
+    `invalid storage engine selected: ${config.get('storageEngine')} \n` +
+    'supported engines: S3 , FS';
+  switch (config.get('storageEngine').toUpperCase()) {
+    case 'FS':
+      deleted = await deleteFilesFS(files);
+      break;
+    case 'S3':
+      deleted = await deleteFilesS3(files);
+      break;
+    default:
+      logger.error(invalidEngineMessage);
+      return Promise.reject(
+        exception(`invalid storage engine: ${config.get('storageEngine')}`)
+      );
+  }
   deleteFromDb(deleted);
   return files.length !== batchSize;
 }
@@ -100,7 +192,11 @@ async function main() {
   let offset = 0;
   let done = false;
   do {
-    done = await deleteBatch(batchSize, offset);
+    try {
+      done = await deleteBatch(batchSize, offset);
+    } catch (err) {
+      return Promise.reject(err);
+    }
     offset += batchSize;
   } while (!done);
 }
