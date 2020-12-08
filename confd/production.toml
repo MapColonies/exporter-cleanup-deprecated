@@ -4,7 +4,15 @@ dest = "/config/production.json"
 keys = [
     "/configuration/logger/level",
     "/configuration/db/service/url",
-    "/configuration/max/retries",
-    "/configuration/export/directory",
-    "/configuration/batch/size"
+    "/configuration/db/max/retries",
+    "/configuration/fs/export/directory",
+    "/configuration/batch/size",
+    "/configuration/file/formats",
+    "/configuration/s3/api/version",
+    "/configuration/s3/endpoint",
+    "/configuration/s3/access/key/id",
+    "/configuration/s3/secret/access/key",
+    "/configuration/s3/max/retries",
+    "/configuration/s3/ssl",
+    "/configuration/s3/bucket"
 ]

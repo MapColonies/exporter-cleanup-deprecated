@@ -2,8 +2,23 @@
   "logger": {
     "level": "{{ getv "/configuration/logger/level" "warn" }}"
   },
-  "dbServiceUrl": "{{ getv "/configuration/db/service/url" "http://localhost:8081" }}",
-  "maxRetries": {{ getv "/configuration/max/retries" "3" }},
-  "exportDirectory": "{{ getv "/configuration/export/directory" "/exporterOutput" }}",
-  "batchSize": {{ getv "/configuration/batch/size" "100" }}
+  "db":{
+    "ServiceUrl": "{{ getv "/configuration/db/service/url" "http://localhost:8081" }}",
+    "MaxRetries": {{ getv "/configuration/db/max/retries" "3" }}
+  },
+  "batchSize": {{ getv "/configuration/batch/size" "100" }},
+  "fileFormats": {{ getv "/configuration/file/formats" "[\"GPKG\"]" }},
+  "storageEngine" : "{{ getv "/configuration/storage/engine" "FS" }}",
+  "fs": {
+    "exportDirectory": "{{ getv "/configuration/fs/export/directory" "/exporterOutput" }}"
+  },
+  "s3": {
+    "apiVersion": "{{ getv "/configuration/s3/api/version" "2006-03-01" }}",
+    "endpoint": "{{ getv "/configuration/s3/endpoint" "http://localhost:9000" }}",
+    "accessKeyId": "{{ getv "/configuration/s3/access/key/id" "user" }}",
+    "secretAccessKey": "{{ getv "/configuration/s3/secret/access/key" "password" }}",
+    "maxRetries": {{ getv "/configuration/s3/max/retries" "3" }},
+    "sslEnabled": {{ getv "/configuration/s3/ssl" "false" }},
+    "bucket": "{{ getv "/configuration/s3/ssl" "packages" }}"
+  }
 }
