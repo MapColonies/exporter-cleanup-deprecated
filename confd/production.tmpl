@@ -9,7 +9,9 @@
   "batchSize": {{ getv "/configuration/batch/size" "100" }},
   "fileFormats": {{ getv "/configuration/file/formats" "[\"GPKG\"]" }},
   "storageEngine" : "{{ getv "/configuration/storage/engine" "FS" }}",
-  "exportDirectory": "{{ getv "/configuration/export/directory" "/exporterOutput" }}",
+  "fs": {
+    "exportDirectory": "{{ getv "/configuration/fs/export/directory" "/exporterOutput" }}"
+  },
   "s3": {
     "apiVersion": "{{ getv "/configuration/s3/api/version" "2006-03-01" }}",
     "endpoint": "{{ getv "/configuration/s3/endpoint" "http://localhost:9000" }}",

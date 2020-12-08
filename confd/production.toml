@@ -5,7 +5,7 @@ keys = [
     "/configuration/logger/level",
     "/configuration/db/service/url",
     "/configuration/db/max/retries",
-    "/configuration/export/directory",
+    "/configuration/fs/export/directory",
     "/configuration/batch/size",
     "/configuration/file/formats",
     "/configuration/s3/api/version",

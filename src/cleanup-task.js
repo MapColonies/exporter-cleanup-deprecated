@@ -59,7 +59,7 @@ async function deleteFromDb(deletedIds) {
 
 async function deleteFilesFS(files) {
   const deleted = new Set();
-  const exportDirectory = config.get('exportDirectory');
+  const exportDirectory = config.get('fs.exportDirectory');
   const formats = config.get('fileFormats');
   files.forEach((file) => {
     let path = `${exportDirectory}/`;
@@ -76,9 +76,8 @@ async function deleteFilesFS(files) {
           deleted.add(file.taskId);
         } catch (err) {
           logger.error(
-            `failed to delete file: ${fullPath} task id: ${file.taskId}, ${err.message}`
+            `failed to delete file: ${fullPath} task id: ${file.taskId}, err: ${JSON.stringify(err)}`
           );
-          logger.error(`err: ${JSON.stringify(err)}`);
         }
       }
     });
@@ -171,17 +170,17 @@ async function deleteBatch(batchSize, offset) {
     `invalid storage engine selected: ${config.get('storageEngine')} \n` +
     'supported engines: S3 , FS';
   switch (config.get('storageEngine').toUpperCase()) {
-    case 'FS':
-      deleted = await deleteFilesFS(files);
-      break;
-    case 'S3':
-      deleted = await deleteFilesS3(files);
-      break;
-    default:
-      logger.error(invalidEngineMessage);
-      return Promise.reject(
-        exception(`invalid storage engine: ${config.get('storageEngine')}`)
-      );
+  case 'FS':
+    deleted = await deleteFilesFS(files);
+    break;
+  case 'S3':
+    deleted = await deleteFilesS3(files);
+    break;
+  default:
+    logger.error(invalidEngineMessage);
+    return Promise.reject(
+      exception(`invalid storage engine: ${config.get('storageEngine')}`)
+    );
   }
   deleteFromDb(deleted);
   return files.length !== batchSize;
