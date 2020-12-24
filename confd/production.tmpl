@@ -19,6 +19,6 @@
     "secretAccessKey": "{{ getv "/configuration/s3/secret/access/key" "password" }}",
     "maxRetries": {{ getv "/configuration/s3/max/retries" "3" }},
     "sslEnabled": {{ getv "/configuration/s3/ssl" "false" }},
-    "bucket": "{{ getv "/configuration/s3/ssl" "packages" }}"
+    "bucket": "{{ getv "/configuration/s3/bucket" "packages" }}"
   }
 }
