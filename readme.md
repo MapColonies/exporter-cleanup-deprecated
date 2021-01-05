@@ -26,3 +26,5 @@ The configuration contains the following values:
    -  maxRetries: max retries to reach s3.
    -  sslEnabled: should connection to s3 be encrypted with ssl.
    -  bucket: name of storage bucket with the file to delete.
+### notes
+  - In order for FS configuration to work the mounted directory must have write permissions on every exported file

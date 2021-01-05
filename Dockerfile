@@ -5,18 +5,16 @@ RUN wget -O '/confd/confd' 'https://github.com/kelseyhightower/confd/releases/do
 RUN chmod +x /confd/confd
 
 FROM node-base as production
-RUN groupadd -r app && useradd -r -g app app
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 WORKDIR /usr/app
 RUN mkdir ./confd && cp /confd/confd ./confd/confd
-COPY ./run.sh ./run.sh
-RUN chmod +x run.sh
 COPY ./package*.json ./
 RUN npm install --only=production
 COPY . .
 
-RUN chown -R app . && mkdir -p /home/app/.config && chown -R app:app /home/app/.config
-USER app:app
+RUN  chmod +x run.sh && \
+    chmod 777 ./confd && mkdir config && chmod 777 ./config
 
+# when using fs the mounted directory must grant read and write premissions the the containter user.
 CMD ["./run.sh"]
