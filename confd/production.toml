@@ -5,6 +5,7 @@ keys = [
     "/configuration/logger/level",
     "/configuration/db/service/url",
     "/configuration/db/max/retries",
+    "/configuration/storage/engine",
     "/configuration/fs/export/directory",
     "/configuration/batch/size",
     "/configuration/file/formats",
