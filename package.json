@@ -1,6 +1,6 @@
 {
   "name": "exporter-cleanup",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "map exporter cleanup task worker",
   "main": "src/cleanup-task.js",
   "scripts": {
